@@ -17,7 +17,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 
-public class OsUserCntAppV4 {
+public class OsUserCntAppWithBloomFilter {
 
     public static void main(String[] args) throws Exception {
 

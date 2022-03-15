@@ -6,6 +6,7 @@ import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.time.Time;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -70,7 +71,7 @@ public class FlinkUtils {
         int checkpointInterval = tool.getInt("checkpoint.interval", 5000);
         String checkpointPath = tool.get("checkpoint.path", "file:///opt/state");
 
-        env.enableCheckpointing(checkpointInterval);
+        env.enableCheckpointing(checkpointInterval, CheckpointingMode.EXACTLY_ONCE);
         env.setStateBackend(new FsStateBackend(checkpointPath));
         env.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
         env.setRestartStrategy(RestartStrategies.fixedDelayRestart(2, Time.of(5, TimeUnit.SECONDS)));

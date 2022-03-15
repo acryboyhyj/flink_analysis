@@ -28,25 +28,20 @@ import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 public class TurnOverCount {
     static public Logger logger = LoggerFactory.getLogger(TurnOverCount.class);
     public static void main(String[] args) throws Exception {
 
-        URL resource = TurnOverCount.class.getResource("/myjob.properties");
-        logger.warn("resource:{}",TurnOverCount.class.getResource(""));
-        logger.warn("resource:{}",TurnOverCount.class.getResource("/"));
-        String[] propertiesArray =  new String[1];
-        propertiesArray[0] = "abc";
-        propertiesArray[0] = resource.getPath();
-
-        DataStream<String> stream = FlinkUtils.createKafkaStreamV2(propertiesArray, SimpleStringSchema.class);
-        stream.print();
+        DataStream<String> stream = FlinkUtils.createKafkaStreamV2(args, SimpleStringSchema.class);
+//        stream.print();
         FlinkUtils.env.setParallelism(4);
-//        getTurnOverCount(stream);
         getTurnOverCount(stream);
         FlinkUtils.env.execute();
     }
@@ -56,16 +51,16 @@ public class TurnOverCount {
 //        source.print();
 
         String formatIn = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ";
-
         FastDateFormat format = FastDateFormat.getInstance(formatIn);
+
 
         SingleOutputStreamOperator<ShoppingRecords> inputStream = source.map(new MapFunction<String, ShoppingRecords>() {
                     @Override
                     public ShoppingRecords map(String value) throws Exception {
                         // 注意事项：一定要考虑解析的容错性
                         try {
-                            System.out.println("v"+value);
                             ShoppingRecords bean = JSON.parseObject(value, ShoppingRecords.class);
+
                             return bean;
                         } catch (Exception e) {
                             e.printStackTrace(); // 写到某个地方
@@ -90,7 +85,6 @@ public class TurnOverCount {
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 .sum(1);
         result.print();
-//        System.out.println("fuckyou");
 
 //
 //        result.print("no randome key");
