@@ -129,7 +129,7 @@ jstat 可以看到一只在发生fullgc， checkpoint的大小一直在增大 �
 
 org.apache.flink.runtime.state.heap.CopyOnWriteStateMap$StateMapEntry和 org.apache.flink.streaming.api.operators.TimerHeapInternalTimer.
 似乎state和定时器都未被清理
-    https://github.com/acryboyhyj/flink_analysis/blob/main/img/Image2.png
+    https://github.com/acryboyhyj/flink_analysis/blob/main/img/image2.png
 
 3.此时不知道接下来怎么排查了,在网上提问,对方说要看一下gclog,对方提到本身taskmanager是默认配置的内存,TM Task Heap只有300多M.可能还来不及清楚就OOM掉了
 
@@ -139,7 +139,7 @@ env.java.opts: -Xloggc:/opt/gc.log -XX:+PrintGCApplicationStoppedTime -XX:+Prin
 
 参考https://zhuanlan.zhihu.com/p/352779662,用GcView查看
 
- https://github.com/acryboyhyj/flink_analysis/blob/main/img/Image3.png
+ https://github.com/acryboyhyj/flink_analysis/blob/main/img/image3.png
 
 用gcviewr分析了一下gclog, Gcviewr看显示fullgc后最大剩下300M左右,此处帖子提到heap要放大道300M的 3-5倍,于是把TM heap提升到了1GB
 
