@@ -7,7 +7,6 @@
     配置是2个机器，每个2核，slots设置的也是每个2，并行度是4，其他jobmanager和taskmanager的内存是默认配置
     
     
- 
 
 * 代码片段
 
@@ -53,7 +52,8 @@ env.java.opts: -XX:+UseCMSInitiatingOccupancyOnly -XX:+AlwaysPreTouch -server -X
 
 - 分析dump文件发现占用的还是ContinuousEventTimeTrigger所在的window多
 
-![36900865a1879354baf1c9a385f9f2aa.png](en-resource://database/6392:0)
+    
+https://github.com/acryboyhyj/flink_analysis/blob/main/img/Image.png
 
 
 - 查阅了一些资料及阅读了flink相关的代码部分,ContinuousEventTimeTrigger 触发时仅仅返回了FIRE,不会删除window state
@@ -128,7 +128,8 @@ jstat 可以看到一只在发生fullgc， checkpoint的大小一直在增大 �
 - 继续分析dumpmat分析dump 内存占用较大的是 
 
 org.apache.flink.runtime.state.heap.CopyOnWriteStateMap$StateMapEntry和 org.apache.flink.streaming.api.operators.TimerHeapInternalTimer.
-似乎state和定时器都未被清理![1708c20e01bff6ddee2070be43cd1bf3.png](en-resource://database/6394:1)
+似乎state和定时器都未被清理
+    https://github.com/acryboyhyj/flink_analysis/blob/main/img/Image2.png
 
 3.此时不知道接下来怎么排查了,在网上提问,对方说要看一下gclog,对方提到本身taskmanager是默认配置的内存,TM Task Heap只有300多M.可能还来不及清楚就OOM掉了
 
@@ -138,7 +139,7 @@ env.java.opts: -Xloggc:/opt/gc.log -XX:+PrintGCApplicationStoppedTime -XX:+Prin
 
 参考https://zhuanlan.zhihu.com/p/352779662,用GcView查看
 
-![9f0059ae36d10d2b63a24082488eba76.png](en-resource://database/6396:1)
+ https://github.com/acryboyhyj/flink_analysis/blob/main/img/Image3.png
 
 用gcviewr分析了一下gclog, Gcviewr看显示fullgc后最大剩下300M左右,此处帖子提到heap要放大道300M的 3-5倍,于是把TM heap提升到了1GB
 
